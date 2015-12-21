@@ -46,135 +46,39 @@ if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
           wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
         }
         echo "<div class='wrap'>
-            <h2>WP Feedback Skin Settings</h2>".
-            settings_fields( 'wpfeedbackskin_set_group' ).
-            "<form action='options.php' method='post'>
-                <table class='form-table'>
-                    <tr>
-                        <td><label for='ajaxUrl'>Ajax URL:</label>
-                            <input type='text' id='ajaxurl'> 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='html2CanvasUrl'>HTML 2 Canvas URL:</label>
-                            <input type='text' id='html2CanvasUrl'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='initButtonText'>Initial Button Text:</label>
-                            <input type='text' id='initButtonText'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='browserInfo'>Post Browser Info?</label>
-                            <input type='checkbox' id='browserInfo'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='postHtml'>Post HTML?:</label>
-                            <input type='checkbox' id='postHtml'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='postUrl'>Post URL?:</label>
-                            <input type='checkbox' id='postUrl'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='proxy'>Proxy:</label>
-                            <input type='text' id='proxy'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='letterRendering'>Letter Rendering?:</label>
-                            <input type='checkbox' id='letterRendering'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='strokeStyle'>Stroke Style:</label>
-                            <input type='text' id='strokeStyle'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='shadowColor'>Stroke Color:</label>
-                            <input type='text' id='shadowColor'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='shadowOffsetX'>Shadow Offset X:</label>
-                            <input type='number' id='shadowOffsetX'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='shadowOffsetY'>Shadow Offset Y:</label>
-                            <input type='number' id='shadowOffsetY'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='shadowBlur'>Shadow Blur:</label>
-                            <input type='number' id='shadowBlur'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='lineJoin'>Line Join:</label>
-                            <input type='text' id='lineJoin'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='lineWidth'>Line Width:</label>
-                            <input type='number' id='lineWidth'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='onClose'>On Close (JS):</label>
-                            <input type='text' id='onClose'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='screenshotStroke'>Screenshot Stroke?</label>
-                            <input type='checkbox' id='screenshotStroke'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='highlightElement'>Highlight HTML Elements?</label>
-                            <input type='checkbox' id='highlightElement'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='initialBox'>Describe bug before hightlight?</label>
-                            <input type='checkbox' id='initialBox'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='feedbackButton'>Define a Custom button with a CSS class:</label>
-                            <input type='text' id='feedbackButton'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='showDescriptionModal'>Show Description?</label>
-                            <input type='checkbox' id='showDescriptionModal'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='onScreenshotTaken'>On Screenshot Taken (JS):</label>
-                            <input type='textbox' id='onScreenshotTaken'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='isDraggable'>Draggable?</label>
-                            <input type='checkbox' id='isDraggable'>
-                        </td>
-                    </tr>
-                </table>
-                <p class='submit'>
+            <h2>WP Feedback Skin Settings</h2>
+                <form action='options.php' method='post'>";
+
+            settings_fields('wpfeedbackskin_set_group');
+            do_settings_sections('wpfeedbackskin-settings');
+
+            echo "<p class='submit'>
                     <input type='submit' class='button button-primary' value='Save Changes'>
                 </p>
             </form>
         </div>";
     }
 
+    function wpfeedbackskin_main_settings_output() {
+        echo "<p>Standard settings</p>";
+
+    }
+
+    // function wpfeedbackskin_adv_settings_output() {
+    //     echo "<p>These settings should only be changed if you know what you are doing. Only recommended for advanced users!</p>";
+    // }
+
+    function wpfeedbackskin_display_inputs() {
+        $options = get_option('wpfeedbackskin_options');
+        echo "<input id='plugin_text_string' name='wpfeedbackskin_options[text_string]' size='40' type='text' value='{$options['text_string']}' />";
+    }
+
     function wpfeedbackskin_menu_register_settings() { // whitelist options
-      register_setting( 'wpfeedbackskin_set_group', 'new_option_name' );
+        register_setting( 'wpfeedbackskin_set_group', 'wpfeedbackskin_options' );
+      add_settings_section('wpfeedbackskin_main_settings', 'Standard Settings', 'wpfeedbackskin_main_settings_output', 'wpfeedbackskin-settings');
+      add_settings_field('wpfeedbackskin_ajaxURL', 'Ajax URL', 'wpfeedbackskin_display_inputs', 'wpfeedbackskin-settings', 'wpfeedbackskin_main_settings');
+
+      // add_settings_section('wpfeedbackskin_adv_settings', 'Advanced Settings', 'wpfeedbackskin_adv_settings_output', 'wpfeedbackskin-settings');  
     }
 
     if ( is_admin() ){ // admin actions
