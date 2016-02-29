@@ -27,10 +27,6 @@ Copyright 2015 Dylan Hildenbrand  (email : dylan.hildenbrand@gmail.com)
 
 if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-    class WPFeedbackSkin {
-
-    }
-
     function wpfeedbackskin_menu() {
         add_options_page( 
             'WP Feedback Skin Options', 
@@ -45,141 +41,199 @@ if( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
         if ( !current_user_can( 'manage_options' ) )  {
           wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
         }
-        echo "<div class='wrap'>
-            <h2>WP Feedback Skin Settings</h2>".
-            settings_fields( 'wpfeedbackskin_set_group' ).
-            "<form action='options.php' method='post'>
-                <table class='form-table'>
-                    <tr>
-                        <td><label for='ajaxUrl'>Ajax URL:</label>
-                            <input type='text' id='ajaxurl'> 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='html2CanvasUrl'>HTML 2 Canvas URL:</label>
-                            <input type='text' id='html2CanvasUrl'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='initButtonText'>Initial Button Text:</label>
-                            <input type='text' id='initButtonText'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='browserInfo'>Post Browser Info?</label>
-                            <input type='checkbox' id='browserInfo'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='postHtml'>Post HTML?:</label>
-                            <input type='checkbox' id='postHtml'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='postUrl'>Post URL?:</label>
-                            <input type='checkbox' id='postUrl'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='proxy'>Proxy:</label>
-                            <input type='text' id='proxy'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='letterRendering'>Letter Rendering?:</label>
-                            <input type='checkbox' id='letterRendering'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='strokeStyle'>Stroke Style:</label>
-                            <input type='text' id='strokeStyle'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='shadowColor'>Stroke Color:</label>
-                            <input type='text' id='shadowColor'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='shadowOffsetX'>Shadow Offset X:</label>
-                            <input type='number' id='shadowOffsetX'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='shadowOffsetY'>Shadow Offset Y:</label>
-                            <input type='number' id='shadowOffsetY'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='shadowBlur'>Shadow Blur:</label>
-                            <input type='number' id='shadowBlur'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='lineJoin'>Line Join:</label>
-                            <input type='text' id='lineJoin'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='lineWidth'>Line Width:</label>
-                            <input type='number' id='lineWidth'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='onClose'>On Close (JS):</label>
-                            <input type='text' id='onClose'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='screenshotStroke'>Screenshot Stroke?</label>
-                            <input type='checkbox' id='screenshotStroke'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='highlightElement'>Highlight HTML Elements?</label>
-                            <input type='checkbox' id='highlightElement'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='initialBox'>Describe bug before hightlight?</label>
-                            <input type='checkbox' id='initialBox'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='feedbackButton'>Define a Custom button with a CSS class:</label>
-                            <input type='text' id='feedbackButton'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='showDescriptionModal'>Show Description?</label>
-                            <input type='checkbox' id='showDescriptionModal'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='onScreenshotTaken'>On Screenshot Taken (JS):</label>
-                            <input type='textbox' id='onScreenshotTaken'>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for='isDraggable'>Draggable?</label>
-                            <input type='checkbox' id='isDraggable'>
-                        </td>
-                    </tr>
-                </table>
+        ?>
+        <div class='wrap'>
+            <h2><?php echo esc_html(get_admin_page_title()); ?></h2>
+            <h3 class="nav-tab-wrapper">
+                <?php 
+                    $active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'wpfeedback-bools';
+
+                    // Add more tabs to options here
+                    $tab_page_array = [
+                        'wpfeedback-bools' => 'Boolean Options',
+                        'wpfeedback-strings' => 'String Options',
+                        'wpfeedback-funcs' => 'Custom Functions'
+                        ];
+
+                    // Show tabbed options pages
+                    foreach ($tab_page_array as $tp_key => $tp_val) {?>
+                        <a class="nav-tab <?php echo $active_tab == $tp_key ? 'nav-tab-active' : ''; ?>" href="?page=wp-feedback-skin-options-menu&tab=<?php echo $tp_key;?>" class="nav-tab"><?php echo $tp_val;?></a>
+                        
+                    <?php }
+                ?>
+
+            </h3>
+
+            <form method="post" action='options.php' method='post'>
+
+                <?php
+                    if ($active_tab == 'wpfeedback-bools') {
+                        ?>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-browserInfo">
+                                <input type="checkbox" id="wpfeedbackskin_options-browserInfo" name="wpfeedbackskin_options[browserInfo]" value="1"/>
+                                <span><?php esc_attr_e('Post Browser Info');?></span>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-postUrl">
+                                <input type="checkbox" id="wpfeedbackskin_options-postUrl" name="wpfeedbackskin_options[postUrl]" value="1"/>
+                                <span><?php esc_attr_e('Post URL');?></span>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-postHtml">
+                                <input type="checkbox" id="wpfeedbackskin_options-postHtml" name="wpfeedbackskin_options[postHtml]" value="1"/>
+                                <span><?php esc_attr_e('Post HTML');?></span>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-letterRendering">
+                                <input type="checkbox" id="wpfeedbackskin_options-letterRendering" name="wpfeedbackskin_options[letterRendering]" value="1"/>
+                                <span><?php esc_attr_e('Letter Rendering');?></span>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-screenshotStroke">
+                                <input type="checkbox" id="wpfeedbackskin_options-screenshotStroke" name="wpfeedbackskin_options[screenshotStroke]" value="1"/>
+                                <span><?php esc_attr_e('Screenshot Stroke');?></span>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-highlightElement">
+                                <input type="checkbox" id="wpfeedbackskin_options-highlightElement" name="wpfeedbackskin_options[highlightElement]" value="1"/>
+                                <span><?php esc_attr_e('Highlight HTML Elements');?></span>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-initialBox">
+                                <input type="checkbox" id="wpfeedbackskin_options-initialBox" name="wpfeedbackskin_options[initialBox]" value="1"/>
+                                <span><?php esc_attr_e('Describe bug before hightlight');?></span>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-showDescriptionModal">
+                                <input type="checkbox" id="wpfeedbackskin_options-showDescriptionModal" name="wpfeedbackskin_options[showDescriptionModal]" value="1"/>
+                                <span><?php esc_attr_e('Show Description');?></span>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-isDraggable">
+                                <input type="checkbox" id="wpfeedbackskin_options-isDraggable" name="wpfeedbackskin_options[isDraggable]" value="1"/>
+                                <span><?php esc_attr_e('Draggable');?></span>
+                            </label>
+                        </fieldset>
+                        <?php
+                    }
+                    elseif ($active_tab == 'wpfeedback-strings') {
+                        ?>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-ajaxUrl">
+                                <div><?php esc_attr_e('Ajax URL');?></div>
+                                <input type="text" id="wpfeedbackskin_options-ajaxUrl" name="wpfeedbackskin_options[ajaxUrl]" value=""/>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-html2CanvasUrl">
+                                <div><?php esc_attr_e('HTML 2 Canvas URL');?></div>
+                                <input type="text" id="wpfeedbackskin_options-html2CanvasUrl" name="wpfeedbackskin_options[html2CanvasUrl]" value=""/>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-initButtonText">
+                                <div><?php esc_attr_e('Initial Button Text');?></div>
+                                <input type="text" id="wpfeedbackskin_options-initButtonText" name="wpfeedbackskin_options[initButtonText]" value=""/>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-proxy">
+                                <div><?php esc_attr_e('Proxy');?></div>
+                                <input type="text" id="wpfeedbackskin_options-proxy" name="wpfeedbackskin_options[proxy]" value=""/>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-lineJoin">
+                                <div><?php esc_attr_e('Line Join');?></div>
+                                <input type="text" id="wpfeedbackskin_options-lineJoin" name="wpfeedbackskin_options[lineJoin]" value=""/>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-feedbackButton">
+                                <div><?php esc_attr_e('Define a Custom button with a CSS class');?></div>
+                                <input type="text" id="wpfeedbackskin_options-feedbackButton" name="wpfeedbackskin_options[feedbackButton]" value=""/>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-strokeStyle">
+                                <div><?php esc_attr_e('Stroke Style');?></div>
+                                <input type="text" id="wpfeedbackskin_options-strokeStyle" name="wpfeedbackskin_options[strokeStyle]" value=""/>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-shadowColor">
+                                <div><?php esc_attr_e('Stroke Color');?></div>
+                                <input type="text" id="wpfeedbackskin_options-shadowColor" name="wpfeedbackskin_options[shadowColor]" value=""/>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-shadowOffsetX">
+                                <div><?php esc_attr_e('Shadow Offset X');?></div>
+                                <input type="number" id="wpfeedbackskin_options-shadowOffsetX" name="wpfeedbackskin_options[shadowOffsetX]" value=""/>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-shadowOffsetY">
+                                <div><?php esc_attr_e('Shadow Offset Y');?></div>
+                                <input type="number" id="wpfeedbackskin_options-shadowOffsetY" name="wpfeedbackskin_options[shadowOffsetY]" value=""/>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-shadowBlur">
+                                <div><?php esc_attr_e('Shadow Blur');?></div>
+                                <input type="number" id="wpfeedbackskin_options-shadowBlur" name="wpfeedbackskin_options[shadowBlur]" value=""/>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-lineWidth">
+                                <div><?php esc_attr_e('Line Width');?></div>
+                                <input type="number" id="wpfeedbackskin_options-lineWidth" name="wpfeedbackskin_options[lineWidth]" value=""/>
+                            </label>
+                        </fieldset>
+                        <?php
+                    }
+                    else {
+                        ?>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-onClose">
+                                <div><?php esc_attr_e('On Close (JS)');?></div>
+                                <textarea id="wpfeedbackskin_options-onClose" name="wpfeedbackskin_options[onClose]" value="" rows="6" cols="60"></textarea>
+                            </label>
+                        </fieldset>
+                        <fieldset>
+                            <label for="wpfeedbackskin_options-onScreenshotTaken">
+                                <div><?php esc_attr_e('On Screenshot Taken (JS)');?></div>
+                                <textarea type="textbox" id="wpfeedbackskin_options-onScreenshotTaken" name="wpfeedbackskin_options[onScreenshotTaken]" value="" rows="6" cols="60"></textarea>
+                            </label>
+                        </fieldset>
+
+                        <?php
+                    }
+                ?>
                 <p class='submit'>
                     <input type='submit' class='button button-primary' value='Save Changes'>
                 </p>
             </form>
-        </div>";
+        </div>
+        <?php
     }
 
-    function wpfeedbackskin_menu_register_settings() { // whitelist options
-      register_setting( 'wpfeedbackskin_set_group', 'new_option_name' );
-    }
+    // function wpfeedbackskin_menu_register_settings() { // whitelist options
+    //   register_setting( 'wpfeedbackskin_set_group', 'new_option_name' );
+    // }
 
     if ( is_admin() ){ // admin actions
       add_action( 'admin_menu', 'wpfeedbackskin_menu' );
-      add_action( 'admin_init', 'wpfeedbackskin_menu_register_settings' );
+      // add_action( 'admin_init', 'wpfeedbackskin_menu_register_settings' );
     }
 
 ?>
